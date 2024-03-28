@@ -1,8 +1,10 @@
 const express = require("express");
 const { notFound, errHandler } = require("./middlewares/errHandler");
 const app = express();
+const cookieParser = require("cookie-parser")
 require("dotenv").config();
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

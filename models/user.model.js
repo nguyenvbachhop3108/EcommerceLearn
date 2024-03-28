@@ -1,10 +1,10 @@
-"use strict"
+"use strict";
 
 const { model, Schema } = require("mongoose");
 const bcrypt = require("bcrypt");
 
-const DOCUMANT_NAME = "User"
-const COLLECTION_NAME = "Users"
+const DOCUMANT_NAME = "User";
+const COLLECTION_NAME = "Users";
 
 const userSchema = new Schema(
   {
@@ -59,7 +59,7 @@ const userSchema = new Schema(
       type: String,
     },
     passwordChangedAt: {
-      type: String, 
+      type: String,
     },
     passwordResetToken: {
       type: String,
@@ -70,7 +70,7 @@ const userSchema = new Schema(
   },
   {
     timestamps: true,
-    collection: COLLECTION_NAME
+    collection: COLLECTION_NAME,
   }
 );
 
@@ -79,5 +79,11 @@ userSchema.pre("save", async function (next) {
   const salt = bcrypt.genSaltSync(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
+
+userSchema.methods = {
+  isCorrectPassword: async function (password) {
+    return await bcrypt.compare(password, this.password);
+  },
+};
 
 module.exports = { user: model(DOCUMANT_NAME, userSchema) };
