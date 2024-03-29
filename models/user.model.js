@@ -2,6 +2,7 @@
 
 const { model, Schema } = require("mongoose");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 const DOCUMANT_NAME = "User";
 const COLLECTION_NAME = "Users";
@@ -84,6 +85,15 @@ userSchema.methods = {
   isCorrectPassword: async function (password) {
     return await bcrypt.compare(password, this.password);
   },
+  createPasswordChangedToken: function () {
+    const resetPasswordToken = crypto.randomBytes(32).toString("hex");
+    this.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetPasswordToken)
+      .digest("hex");
+    this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+    return resetPasswordToken
+  },
 };
 
-module.exports = { user: model(DOCUMANT_NAME, userSchema) };
+module.exports = { User: model(DOCUMANT_NAME, userSchema) };
