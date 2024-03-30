@@ -131,14 +131,6 @@ const ratingsProduct = asyncHandler(async (req, res) => {
         new: true,
       }
     );
-    // const ratings = await Product.findByIdAndUpdate(
-    //   pId,
-    //   req.body,
-    //   {
-    //     new: true,
-    //   }
-    // );
-    console.log("🚀 ~ ratingsProduct ~ ratings:", ratings);
   }
   return res.status(200).json({
     success: true,
