@@ -21,4 +21,10 @@ const verifyAccessToken = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { verifyAccessToken };
+const checkRoles = asyncHandler((req, res,next)=>{
+  const {roles} = req.user
+  if(roles != "admin") throw new Error("Permission deined!")
+  next()
+})
+
+module.exports = { verifyAccessToken, checkRoles };
