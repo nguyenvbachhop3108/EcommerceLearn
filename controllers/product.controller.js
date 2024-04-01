@@ -106,15 +106,17 @@ const ratingsProduct = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { pId, comment, star } = req.body;
   if (!pId || !star) throw new Error("Missing Inputs!");
-  const ratingProduct = await Product.findById(_id);
-  const alreadyRating = ratingProduct?.ratings?.some(
-    (el) => el.postedBy.toString() === _id
+  const ratingProduct = await Product.findById(pId);
+  console.log("🚀 ~ ratingsProduct ~ ratingProduct:", ratingProduct);
+  const alreadyRating = ratingProduct?.ratings?.find(
+    (el) => el.postedBy === _id
   );
+  console.log("🚀 ~ ratingsProduct ~ alreadyRating:", alreadyRating);
   if (alreadyRating) {
     //Update rating before
     await Product.updateOne(
       {
-        ratings: { $elMatch: alreadyRating },
+        ratings: { $elemMatch: alreadyRating },
       },
       {
         $set: { "ratings.$.star": star, "rating.$.comment": comment },
@@ -132,6 +134,14 @@ const ratingsProduct = asyncHandler(async (req, res) => {
       }
     );
   }
+  //Sum ratings
+  const ratingCount = ratingProduct.ratings.length;
+  const sumRating = ratingProduct.ratings.reduce(
+    (acc, el) => acc + +el.star,
+    0
+  );
+  ratingProduct.totalRatings = (sumRating / ratingCount).toFixed(1);
+  await ratingProduct.save()
   return res.status(200).json({
     success: true,
   });
