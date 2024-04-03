@@ -29,8 +29,8 @@ const blogSchema = new Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
     }],
-    image: {
-      type: String,
+    images: {
+      type: Array,
       default:
         "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.wallpaperflare.com%2Fsearch%3Fwallpaper%3Dblogging&psig=AOvVaw2BTP8IJsfw6VuDNfsJ5HXT&ust=1711970153475000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCNiGg4SwnoUDFQAAAAAdAAAAABAE",
     },

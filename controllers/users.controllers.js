@@ -3,6 +3,7 @@ const { User } = require("../models/user.model");
 const { createPairToken } = require("../middlewares/signTokens");
 const { sendMail } = require("../utils/sendMail");
 const crypto = require("crypto");
+const { toObjId } = require("../utils/index");
 
 const register = asyncHandler(async (req, res) => {
   const { email, password, firstname, lastname } = req.body;
@@ -190,12 +191,27 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { userId } = req.user;
-  if (!userId || Object.keys(req.body).length === 0)
+  const _id = req.user.userId;
+  if (!_id || Object.keys(req.body).length === 0)
     throw new Error("Missing Input");
-  const response = await User.findByIdAndUpdate(userId, req.body, {
+  const response = await User.findByIdAndUpdate(_id, req.body, {
     new: true,
   }).select("-password -roles");
+  return res.status(200).json({
+    message: response ? true : false,
+    metadata: response ? response : "Something went wrong",
+  });
+});
+
+const updateUserAddress = asyncHandler(async (req, res) => {
+  const _id = req.user.userId;
+  if (!_id || Object.keys(req.body).length === 0)
+    throw new Error("Missing Input");
+  const response = await User.findByIdAndUpdate(
+    _id,
+    { $push: { address: req.body.address } },
+    { new: true }
+  ).select("-password -roles");
   return res.status(200).json({
     message: response ? true : false,
     metadata: response ? response : "Something went wrong",
@@ -214,6 +230,39 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+const addToCart = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+  const { pId, quantity, color } = req.body;
+
+  if (!pId || !quantity || !color) {
+    throw new Error("Missing Input");
+  }
+
+  const userCart = await User.findById(userId).select("cart");
+  const alreadyProductIndex = userCart.cart.findIndex(
+    (el) => el.product.toString() === pId
+  );
+
+  if (alreadyProductIndex !== -1) {
+    const alreadyProduct = userCart.cart[alreadyProductIndex];
+
+    if (alreadyProduct.color === color) {
+      userCart.cart[alreadyProductIndex].quantity = quantity;
+    } else {
+      userCart.cart.push({ product: pId, quantity, color });
+    }
+  } else {
+    userCart.cart.push({ product: pId, quantity, color });
+  }
+
+  const response = await userCart.save();
+
+  return res.status(200).json({
+    message: response ? true : false,
+    metadata: response ? response : "Something went wrong",
+  });
+});
+
 module.exports = {
   register,
   login,
@@ -226,4 +275,6 @@ module.exports = {
   deleteUser,
   updateUser,
   updateUserByAdmin,
+  updateUserAddress,
+  addToCart,
 };

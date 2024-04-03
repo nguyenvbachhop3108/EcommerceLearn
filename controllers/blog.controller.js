@@ -209,6 +209,23 @@ const getBlogById = asyncHandler(async (req, res) => {
   });
 });
 
+const updateImagesForBlog = asyncHandler(async (req, res) => {
+  const { bId } = req.params;
+  const blogId = await Blog.findById(bId);
+  if (!blogId) throw new Error("Blog Not Found");
+  if (!req.files) throw new Error("Missing input");
+  const response = await Blog.findByIdAndUpdate(
+    bId,
+    {
+      $push: { images: { $each: req.files.map((el) => el.path) } },
+    },
+    { new: true }
+  );
+  return res.status(200).json({
+    success: response ? true : false,
+    metadata: response ? response : "Cannot upload image for blog",
+  });
+});
 
 module.exports = {
   getBlogs,
@@ -218,4 +235,5 @@ module.exports = {
   likeBlog,
   dislikeBlog,
   getBlogById,
+  updateImagesForBlog
 };

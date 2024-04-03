@@ -1,6 +1,6 @@
 "use strict";
 
-const { model, Schema } = require("mongoose");
+const { model, Schema, default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
@@ -36,16 +36,14 @@ const userSchema = new Schema(
       required: true,
       default: "user",
     },
-    cart: {
+    cart: [{
+      product:{ type: mongoose.Types.ObjectId, ref:"Product"},
+      quantity: Number,
+      color:String
+    }],
+    address: {
       type: Array,
-      default: [],
     },
-    address: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Address",
-      },
-    ],
     wishlist: [
       {
         type: Schema.Types.ObjectId,
@@ -92,7 +90,7 @@ userSchema.methods = {
       .update(resetPasswordToken)
       .digest("hex");
     this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
-    return resetPasswordToken
+    return resetPasswordToken;
   },
 };
 

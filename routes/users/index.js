@@ -25,5 +25,15 @@ router.put(
   [verifyAccessToken, checkRoles],
   UserController.updateUserByAdmin
 );
+router.put(
+  "/update/:bid",
+  [verifyAccessToken],
+  UserController.updateUserAddress
+);
+router.put(
+  "",
+  [verifyAccessToken],
+  UserController.addToCart
+);
 
 module.exports = router;

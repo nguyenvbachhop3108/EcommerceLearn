@@ -1,6 +1,6 @@
 const { model, Schema, Types, default: mongoose } = require("mongoose");
 
-const DOCUMANT_NAME = "Prodcut";
+const DOCUMANT_NAME = "Product";
 const COLLECTION_NAME = "Products";
 
 const productSchema = new Schema(

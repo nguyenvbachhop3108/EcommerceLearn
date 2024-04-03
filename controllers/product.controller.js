@@ -141,9 +141,27 @@ const ratingsProduct = asyncHandler(async (req, res) => {
     0
   );
   ratingProduct.totalRatings = (sumRating / ratingCount).toFixed(1);
-  await ratingProduct.save()
+  await ratingProduct.save();
   return res.status(200).json({
     success: true,
+  });
+});
+
+const uploadImageProduct = asyncHandler(async (req, res) => {
+  const {pId} = req.params
+  if (!req.files) throw new Error("Missing inputs");
+  const productId = await Product.findById(pId) 
+  if(!productId) throw new Error("Product not found")
+  const response = await Product.findByIdAndUpdate(
+    productId,
+    {
+      $push: { images: { $each: req.files.map((el) => el.path) } },
+    },
+    { new: true }
+  );
+  return res.status(200).json({
+    success: response ? true : false,
+    metadata: response ? response : "Cannot upload Images product",
   });
 });
 
@@ -154,4 +172,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   ratingsProduct,
+  uploadImageProduct,
 };

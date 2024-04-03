@@ -1,3 +1,4 @@
+const uploadCloud = require("../../configs/cloudinary.config");
 const BlogController = require("../../controllers/blog.controller");
 const {
   verifyAccessToken,
@@ -14,5 +15,11 @@ router.delete(
   "/delete/:bId",
   [verifyAccessToken, checkRoles],
   BlogController.deleteBlog
+);
+router.put(
+  "/uploadimage/:bId",
+  [verifyAccessToken, checkRoles],
+  uploadCloud.array("image", 5),
+  BlogController.updateImagesForBlog
 );
 module.exports = router;
